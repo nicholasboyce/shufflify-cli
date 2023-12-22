@@ -13,10 +13,9 @@ func TestFetchWebAPI(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.URL)
-		if r.Header.Get("Authorization") != "Bearer: token" {
-			t.Errorf("Expected header to be 'Authorization: Bearer: token, got %s'", r.Header.Get("Authorization"))
-		}
-		if r.URL.Path == "/v1/me" { //get profile info
+
+		switch r.URL.Path {
+		case "/v1/me": //get profile info
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprintf(w, `{
 				"display_name": "niko",
@@ -29,7 +28,7 @@ func TestFetchWebAPI(t *testing.T) {
 					}
 				]
 			}`)
-		} else if r.URL.Path == "/v1/me/playlists" { //get current user's playlists
+		case "/v1/me/playlists": //get current user's playlists
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprintf(w, `{
 				"items": [
@@ -46,7 +45,7 @@ func TestFetchWebAPI(t *testing.T) {
 					}
 				]
 			}`)
-		} else if r.URL.Path == "/v1/playlists/playlist_id/tracks" {
+		case "/v1/playlists/playlist_id/tracks":
 			if r.Method == http.MethodGet { // get items from playlist
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`{
@@ -70,17 +69,18 @@ func TestFetchWebAPI(t *testing.T) {
 					"snapshot_id": "abc"
 				}`))
 			}
-		} else if r.URL.Path == "/v1/users/user_id/playlists" { //create a playlist for user
+		case "/v1/users/user_id/playlists": //create a playlist for user
 			w.WriteHeader(http.StatusCreated)
 			w.Write([]byte(`{
 				"external_urls": {
 					"spotify": "shufflify.app"
 				}
 			}`))
-		} else {
+		default:
 			w.WriteHeader(http.StatusBadRequest)
 		}
 	}))
+
 	defer server.Close()
 
 	client := server.Client()
@@ -100,7 +100,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		profileInfo := ProfileInfo{}
 
-		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me", server.URL), nil, &profileInfo, "token", client)
+		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me", server.URL), nil, &profileInfo, client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -143,7 +143,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		playlistItems := PlaylistItems{}
 
-		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me/playlists", server.URL), nil, &playlistItems, "token", client)
+		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me/playlists", server.URL), nil, &playlistItems, client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -173,7 +173,7 @@ func TestFetchWebAPI(t *testing.T) {
 			Snapshot_id string `json:"snapshot_id"`
 		}
 
-		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, "token", client)
+		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
 
 		fmt.Println(response)
 		fmt.Println("")
@@ -196,7 +196,7 @@ func TestFetchWebAPI(t *testing.T) {
 		{
 		}
 
-		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/users/user_id/playlists", server.URL), nil, &response, "token", client)
+		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/users/user_id/playlists", server.URL), nil, &response, client)
 
 		fmt.Println(response)
 		fmt.Println("")

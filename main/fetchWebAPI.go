@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, accessToken string, client *http.Client) (string, error) {
+func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, client *http.Client) (string, error) {
 
 	data := url.Values{}
 	for key, value := range body {
@@ -26,7 +26,6 @@ func FetchWebAPI(method string, resource string, body map[string]string, target 
 	request.Close = true
 
 	fmt.Println(request.Header)
-	fmt.Println(accessToken)
 
 	// request.Header.Add("Authorization", fmt.Sprintf("Bearer: %v", accessToken))
 

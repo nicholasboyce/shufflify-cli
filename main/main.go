@@ -9,11 +9,10 @@ var loggedIn bool = false
 
 func main() {
 
-	var accessToken string
 	var client *http.Client
 
 	if !loggedIn {
-		accessToken, client = LoginProcess()
+		_, client = LoginProcess()
 	}
 
 	type ImageData struct {
@@ -30,7 +29,7 @@ func main() {
 
 	profileInfo := ProfileInfo{}
 
-	x, y := FetchWebAPI("GET", "https://api.spotify.com/v1/me", nil, &profileInfo, accessToken, client)
+	x, y := FetchWebAPI("GET", "https://api.spotify.com/v1/me", nil, &profileInfo, client)
 
 	fmt.Println(x, y)
 	fmt.Println(profileInfo)
