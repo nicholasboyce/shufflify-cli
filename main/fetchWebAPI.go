@@ -25,20 +25,11 @@ func FetchWebAPI(method string, resource string, body map[string]string, target 
 
 	request.Close = true
 
-	fmt.Println(request.Header)
-
-	// request.Header.Add("Authorization", fmt.Sprintf("Bearer: %v", accessToken))
-
-	// fmt.Print(request)
-	// client := &http.Client{
-	// 	Timeout: 30 * time.Second,
-	// } //TODO: Understand why I need to do this when client should be defined during login process
-
 	response, fetchErr := client.Do(request)
 	if fetchErr != nil {
-		return "fetch", fetchErr
+		return "", fetchErr
 	}
-	// fmt.Println(response)
+
 	content, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", err

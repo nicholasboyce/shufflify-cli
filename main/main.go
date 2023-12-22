@@ -12,7 +12,7 @@ func main() {
 	var client *http.Client
 
 	if !loggedIn {
-		_, client = LoginProcess()
+		client = LoginProcess()
 	}
 
 	type ImageData struct {
