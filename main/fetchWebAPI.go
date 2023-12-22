@@ -7,10 +7,9 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
-func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, accessToken string) (string, error) {
+func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, accessToken string, client *http.Client) (string, error) {
 
 	data := url.Values{}
 	for key, value := range body {
@@ -26,12 +25,15 @@ func FetchWebAPI(method string, resource string, body map[string]string, target 
 
 	request.Close = true
 
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer: %v", accessToken))
+	fmt.Println(request.Header)
+	fmt.Println(accessToken)
+
+	// request.Header.Add("Authorization", fmt.Sprintf("Bearer: %v", accessToken))
 
 	// fmt.Print(request)
-	client := &http.Client{
-		Timeout: 30 * time.Second,
-	} //TODO: Understand why I need to do this when client should be defined during login process
+	// client := &http.Client{
+	// 	Timeout: 30 * time.Second,
+	// } //TODO: Understand why I need to do this when client should be defined during login process
 
 	response, fetchErr := client.Do(request)
 	if fetchErr != nil {

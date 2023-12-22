@@ -9,10 +9,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var client *http.Client
-var accessToken string
-
-func LoginProcess() string {
+func LoginProcess() (string, *http.Client) {
 	var clientID string
 
 	fmt.Print("Please input Client ID: ")
@@ -55,9 +52,9 @@ func LoginProcess() string {
 		log.Fatal(err)
 	}
 
-	accessToken = tok.AccessToken
+	accessToken := tok.AccessToken
 
-	client = conf.Client(ctx, tok)
+	client := conf.Client(ctx, tok)
 	loggedIn = true
-	return accessToken
+	return accessToken, client
 }

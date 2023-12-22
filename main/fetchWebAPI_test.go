@@ -78,10 +78,12 @@ func TestFetchWebAPI(t *testing.T) {
 				}
 			}`))
 		} else {
-			w.WriteHeader(http.StatusAccepted)
+			w.WriteHeader(http.StatusBadRequest)
 		}
 	}))
 	defer server.Close()
+
+	client := server.Client()
 
 	t.Run("Checking GET profile info call", func(t *testing.T) {
 		type ImageData struct {
@@ -98,7 +100,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		profileInfo := ProfileInfo{}
 
-		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me", server.URL), nil, &profileInfo, "token")
+		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me", server.URL), nil, &profileInfo, "token", client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -141,7 +143,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		playlistItems := PlaylistItems{}
 
-		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me/playlists", server.URL), nil, &playlistItems, "token")
+		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me/playlists", server.URL), nil, &playlistItems, "token", client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -171,7 +173,7 @@ func TestFetchWebAPI(t *testing.T) {
 			Snapshot_id string `json:"snapshot_id"`
 		}
 
-		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, "token")
+		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, "token", client)
 
 		fmt.Println(response)
 		fmt.Println("")
@@ -194,7 +196,7 @@ func TestFetchWebAPI(t *testing.T) {
 		{
 		}
 
-		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/users/user_id/playlists", server.URL), nil, &response, "token")
+		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/users/user_id/playlists", server.URL), nil, &response, "token", client)
 
 		fmt.Println(response)
 		fmt.Println("")
