@@ -56,3 +56,15 @@ func LoginProcess() *http.Client {
 	loggedIn = true
 	return client
 }
+
+// func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config) error {
+// 	return error
+// }
+
+// func fetchTokenAndConfig() (*oauth2.Token, *oauth2.Config, error) {
+// 	return error
+// }
+
+// func createNewClient() *http.Client {
+// 	return error
+// }

@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 var loggedIn bool = false
@@ -11,9 +14,15 @@ func main() {
 
 	var client *http.Client
 
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	if !loggedIn {
 		client = LoginProcess()
-	}
+	} // else {
+	// 	client = createNewClient()
+	// }
 
 	type ImageData struct {
 		URL string
