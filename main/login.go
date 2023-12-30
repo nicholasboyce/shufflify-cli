@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"golang.org/x/oauth2"
 )
 
-func LoginProcess() *http.Client {
+func LoginProcess(path string) *http.Client {
 	var clientID string
 
 	fmt.Print("Please input Client ID: ")
@@ -53,18 +56,73 @@ func LoginProcess() *http.Client {
 	}
 
 	client := conf.Client(ctx, tok)
-	loggedIn = true
+	saveTokenAndConfig(tok, conf, path)
 	return client
 }
 
-// func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config) error {
-// 	return error
-// }
+func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config, path string) error {
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return fmt.Errorf("unable to create token file: %v", err)
+	}
+	defer file.Close()
 
-// func fetchTokenAndConfig() (*oauth2.Token, *oauth2.Config, error) {
-// 	return error
-// }
+	return encodeTokenAndConfig(file, token, conf)
+}
 
-// func createNewClient() *http.Client {
-// 	return error
-// }
+func encodeTokenAndConfig(file io.Writer, token interface{}, conf interface{}) error {
+	// encode token as JSON and write to file
+	encoder := json.NewEncoder(file)
+
+	if err := encoder.Encode(token); err != nil {
+		return fmt.Errorf("unable to write token to file: %v", err)
+	}
+
+	if err := encoder.Encode(conf); err != nil {
+		return fmt.Errorf("unable to write config struct to file: %v", err)
+	}
+
+	return nil
+}
+
+func fetchTokenAndConfig(path string) (*oauth2.Token, *oauth2.Config, error) {
+	var token *oauth2.Token
+	var conf *oauth2.Config
+
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to open file at %v: %v", path, err)
+	}
+	defer file.Close()
+
+	if err := decodeTokenAndConfig(file, token, conf); err != nil {
+		return nil, nil, err
+	}
+
+	return token, conf, nil
+}
+
+func decodeTokenAndConfig(file io.Reader, token interface{}, conf interface{}) error {
+	//decode from file and write to token and conf structs
+	decoder := json.NewDecoder(file)
+
+	if err := decoder.Decode(token); err != nil {
+		return fmt.Errorf("unable to decode token from file: %v", err)
+	}
+
+	if err := decoder.Decode(conf); err != nil {
+		return fmt.Errorf("unable to decode config struct from file: %v", err)
+	}
+
+	return nil
+}
+
+func createNewClient(path string) *http.Client {
+	ctx := context.Background()
+	tok, conf, err := fetchTokenAndConfig(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	client := conf.Client(ctx, tok)
+	return client
+}
