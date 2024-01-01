@@ -56,12 +56,14 @@ func LoginProcess(path string) *http.Client {
 	}
 
 	client := conf.Client(ctx, tok)
-	saveTokenAndConfig(tok, conf, path)
+	if err := saveTokenAndConfig(tok, conf, path); err != nil {
+		log.Fatal(err)
+	}
 	return client
 }
 
 func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config, path string) error {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("unable to create token file: %v", err)
 	}
@@ -86,8 +88,8 @@ func encodeTokenAndConfig(file io.Writer, token interface{}, conf interface{}) e
 }
 
 func fetchTokenAndConfig(path string) (*oauth2.Token, *oauth2.Config, error) {
-	var token *oauth2.Token
-	var conf *oauth2.Config
+	token := &oauth2.Token{}
+	conf := &oauth2.Config{}
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -124,5 +126,8 @@ func createNewClient(path string) *http.Client {
 		log.Fatal(err)
 	}
 	client := conf.Client(ctx, tok)
+	if err := saveTokenAndConfig(tok, conf, path); err != nil {
+		log.Fatal(err)
+	}
 	return client
 }

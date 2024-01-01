@@ -92,7 +92,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		type ProfileInfo struct {
 			Display_name string      `json:"display_name"`
-			ID           int         `json:"id,string"`
+			ID           string      `json:"id"`
 			URI          string      `json:"uri"`
 			Product      string      `json:"product"`
 			Images       []ImageData `json:"images"`
@@ -108,7 +108,7 @@ func TestFetchWebAPI(t *testing.T) {
 		if profileInfo.Display_name != "niko" {
 			t.Errorf("Expected 'niko', got %q\n", profileInfo.Display_name)
 		}
-		if profileInfo.ID != 417 {
+		if profileInfo.ID != "417" {
 			t.Errorf("Expected '417', got %v\n", profileInfo.ID)
 		}
 		if profileInfo.Images[0].URL != "https://iida.com/images/1234567" {
