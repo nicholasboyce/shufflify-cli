@@ -69,10 +69,10 @@ func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config, path string) e
 	}
 	defer file.Close()
 
-	return encodeTokenAndConfig(file, token, conf)
+	return EncodeTokenAndConfig(file, token, conf)
 }
 
-func encodeTokenAndConfig(file io.Writer, token interface{}, conf interface{}) error {
+func EncodeTokenAndConfig(file io.Writer, token interface{}, conf interface{}) error {
 	// encode token as JSON and write to file
 	encoder := json.NewEncoder(file)
 
@@ -97,14 +97,14 @@ func fetchTokenAndConfig(path string) (*oauth2.Token, *oauth2.Config, error) {
 	}
 	defer file.Close()
 
-	if err := decodeTokenAndConfig(file, token, conf); err != nil {
+	if err := DecodeTokenAndConfig(file, token, conf); err != nil {
 		return nil, nil, err
 	}
 
 	return token, conf, nil
 }
 
-func decodeTokenAndConfig(file io.Reader, token interface{}, conf interface{}) error {
+func DecodeTokenAndConfig(file io.Reader, token interface{}, conf interface{}) error {
 	//decode from file and write to token and conf structs
 	decoder := json.NewDecoder(file)
 

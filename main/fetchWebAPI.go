@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, client *http.Client) (string, error) {
+func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, client *http.Client) (int, error) {
 
 	data := url.Values{}
 	for key, value := range body {
@@ -20,20 +20,20 @@ func FetchWebAPI(method string, resource string, body map[string]string, target 
 
 	if err != nil || request == nil {
 		fmt.Println(err)
-		return "", err
+		return 0, err
 	}
 
 	request.Close = true
 
 	response, fetchErr := client.Do(request)
 	if fetchErr != nil {
-		return "", fetchErr
+		return 0, fetchErr
 	}
 
 	content, err := io.ReadAll(response.Body)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
-	return response.Status, json.Unmarshal(content, &target)
+	return response.StatusCode, json.Unmarshal(content, &target)
 }

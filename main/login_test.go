@@ -1,9 +1,10 @@
-package main
+package main_test
 
 import (
 	"bytes"
 	"testing"
 
+	"github.com/nicholasboyce/shufflify-cli/main"
 	"golang.org/x/oauth2"
 )
 
@@ -21,7 +22,7 @@ func TestTokenAndConfig(t *testing.T) {
 			ClientID: "identification",
 		}
 
-		if err := encodeTokenAndConfig(&bytes, token, conf); err != nil {
+		if err := main.EncodeTokenAndConfig(&bytes, token, conf); err != nil {
 			t.Errorf("Got error: %v\n", err)
 		}
 		result := bytes.String()
@@ -34,7 +35,7 @@ func TestTokenAndConfig(t *testing.T) {
 		token := &oauth2.Token{}
 		conf := &oauth2.Config{}
 
-		if err := decodeTokenAndConfig(&bytes, token, conf); err != nil {
+		if err := main.DecodeTokenAndConfig(&bytes, token, conf); err != nil {
 			t.Errorf("Got error: %v\n", err)
 		}
 		if token.AccessToken != "bellybutton" {
