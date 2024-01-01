@@ -62,7 +62,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(profileInfo)
 		//fetch user playlists
 		if _, err := FetchWebAPI("GET", "https://api.spotify.com/v1/me/playlists", nil, &userPlaylists, client); err != nil {
 			log.Fatal(err)
@@ -76,13 +75,12 @@ func main() {
 			if id, present := userPlaylistNames[name]; present {
 				playlistTracks := TrackItems{}
 				FetchWebAPI("GET", fmt.Sprintf("https://api.spotify.com/v1/playlists/%v/tracks", id), nil, &playlistTracks, client)
-				for _, track := range playlistTracks.Items {
-					tracklist = append(tracklist, track.ID)
+				for _, trackObject := range playlistTracks.Items {
+					tracklist = append(tracklist, trackObject.Track.URI)
 				}
 			}
 		}
 
-		fmt.Println(tracklist)
 		//shuffle tracklist. then ask for title and description of playlist. post to user account.
 		Shuffle(tracklist)
 
@@ -115,6 +113,7 @@ func main() {
 		playlistTrackBodyData := map[string]interface{}{
 			"uris": tracklist,
 		}
+
 		if status, err := FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/playlists/%v/tracks", playlistPostResponse.ID), playlistTrackBodyData, nil, client); status != http.StatusCreated {
 			fmt.Println(status)
 			log.Fatal(err)
@@ -126,6 +125,7 @@ func main() {
 		//if premium account, ask if they want to queue tracks. if yes, for each track in tracklist post to queue.
 		if profileInfo.Product == "premium" {
 			fmt.Println("Would you like to queue the tracks in your new playlist?")
+			fmt.Println("Implementation will be coming soon! For now, head on over to Spotify :)")
 		}
 
 		//when done, print thank you message and say 'all done!'

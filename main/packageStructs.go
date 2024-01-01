@@ -25,11 +25,15 @@ type ProfileInfo struct {
 }
 
 type Track struct {
-	ID string `json:"id"`
+	URI string `json:"uri"`
+}
+
+type TrackObject struct {
+	Track Track `json:"track"`
 }
 
 type TrackItems struct {
-	Items []Track `json:"items"`
+	Items []TrackObject `json:"items"`
 }
 
 type ExternalURLs struct {

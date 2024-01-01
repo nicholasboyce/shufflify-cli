@@ -54,11 +54,10 @@ func TestFetchWebAPI(t *testing.T) {
 							"name": "Groovy!",
 							"uri": "spotify:572",
 							"public": false,
-							"images": [
+							"track": 
 								{
-									"url": "https://yamashitarocks.jp"
-								}
-							],
+									"uri": "https://yamashitarocks.jp"
+								},
 							"id": "572"
 						}
 					]
@@ -169,25 +168,21 @@ func TestFetchWebAPI(t *testing.T) {
 	})
 
 	t.Run("Checking GET items from generic user's playlist", func(t *testing.T) {
-		type ImageData struct {
-			URL string
+		type Track struct {
+			URI string `json:"uri"`
 		}
 
-		type Playlist struct {
-			Name   string      `json:"name"`
-			URI    string      `json:"uri"`
-			Public bool        `json:"public"`
-			Images []ImageData `json:"images"`
-			ID     int         `json:"id,string"`
+		type TrackObject struct {
+			Track Track `json:"track"`
 		}
 
-		type PlaylistItems struct {
-			Items []Playlist `json:"items"`
+		type TrackItems struct {
+			Items []TrackObject `json:"items"`
 		}
 
-		response := PlaylistItems{}
+		response := TrackItems{}
 
-		_, err := main.FetchWebAPI(http.MethodGet, fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
+		status, err := main.FetchWebAPI(http.MethodGet, fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -195,20 +190,12 @@ func TestFetchWebAPI(t *testing.T) {
 		fmt.Println(response)
 		fmt.Println("")
 
-		if response.Items[0].Name != "Groovy!" {
-			t.Errorf("Expected 'Groovy!', got %q\n", response.Items[0].Name)
+		if status != http.StatusOK {
+			t.Errorf("Expected %v, got %v", http.StatusOK, status)
 		}
-		if response.Items[0].URI != "spotify:572" {
-			t.Errorf("Expected 'spotify:572', got %q\n", response.Items[0].URI)
-		}
-		if response.Items[0].Public != false {
-			t.Errorf("Expected %t, got %v", false, response.Items[0].Public)
-		}
-		if response.Items[0].ID != 572 {
-			t.Errorf("Expected '572', got %v", response.Items[0].ID)
-		}
-		if response.Items[0].Images[0].URL != "https://yamashitarocks.jp" {
-			t.Errorf("Expected 'https://yamashitarocks.jp', got %v", response.Items[0].Images[0].URL)
+
+		if response.Items[0].Track.URI != "https://yamashitarocks.jp" {
+			t.Errorf("Expected 'https://yamashitarocks.jp', got %q\n", response.Items[0].Track.URI)
 		}
 
 	})
