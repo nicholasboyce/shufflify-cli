@@ -31,3 +31,12 @@ type Track struct {
 type TrackItems struct {
 	Items []Track `json:"items"`
 }
+
+type ExternalURLs struct {
+	Spotify string `json:"spotify"`
+}
+
+type Response struct {
+	External_urls ExternalURLs `json:"external_urls"`
+	ID            string       `json:"id"`
+}

@@ -61,6 +61,8 @@ func main() {
 		if _, err := FetchWebAPI("GET", "https://api.spotify.com/v1/me", nil, &profileInfo, client); err != nil {
 			log.Fatal(err)
 		}
+
+		fmt.Println(profileInfo)
 		//fetch user playlists
 		if _, err := FetchWebAPI("GET", "https://api.spotify.com/v1/me/playlists", nil, &userPlaylists, client); err != nil {
 			log.Fatal(err)
@@ -80,6 +82,7 @@ func main() {
 			}
 		}
 
+		fmt.Println(tracklist)
 		//shuffle tracklist. then ask for title and description of playlist. post to user account.
 		Shuffle(tracklist)
 
@@ -95,29 +98,39 @@ func main() {
 			log.Fatal(err)
 		}
 
-		playlistData := map[string]string{
+		playlistData := map[string]interface{}{
 			"name":        playlistTitle,
 			"description": playlistDescription,
 		}
 
 		//create user playlist
-		playlistPostResponse := struct {
-			ID string `json:"id"`
-		}{}
+		playlistPostResponse := Response{}
 
-		if status, _ := FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/users/%v/playlists", profileInfo.ID), playlistData, &playlistPostResponse, client); status != http.StatusCreated {
-			fmt.Errorf("Got status %s", status)
+		if status, err := FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/users/%v/playlists", profileInfo.ID), playlistData, &playlistPostResponse, client); status != http.StatusCreated {
+			fmt.Println(status)
+			log.Fatal(err)
 		}
 
 		//add tracks to user playlist
-		FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/playlists/playlist_id/tracks"), tracklist, nil, client)
+		playlistTrackBodyData := map[string]interface{}{
+			"uris": tracklist,
+		}
+		if status, err := FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/playlists/%v/tracks", playlistPostResponse.ID), playlistTrackBodyData, nil, client); status != http.StatusCreated {
+			fmt.Println(status)
+			log.Fatal(err)
+		}
+
+		//post url to playlist for user to click on/copy.
+		fmt.Printf("Check out your new playlist at %v\n", playlistPostResponse.External_urls.Spotify)
+
+		//if premium account, ask if they want to queue tracks. if yes, for each track in tracklist post to queue.
+		if profileInfo.Product == "premium" {
+			fmt.Println("Would you like to queue the tracks in your new playlist?")
+		}
+
+		//when done, print thank you message and say 'all done!'
+		fmt.Println("Thank you for using Shufflify!")
 	}
-
-	//post url to playlist for user to click on/copy.
-	//if premium account, ask if they want to queue tracks. if yes, for each track in tracklist post to queue.
-	//when done, print thank you message and say 'all done!'
-
-	//TODO: LOGOUT FUNCTION: deletes the config file at saved path in environment variable
 
 }
 

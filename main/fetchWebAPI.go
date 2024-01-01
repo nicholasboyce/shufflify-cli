@@ -1,24 +1,32 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"net/url"
-	"strings"
 )
 
-func FetchWebAPI(method string, resource string, body map[string]string, target interface{}, client *http.Client) (int, error) {
+func FetchWebAPI(method string, resource string, body map[string]any, target interface{}, client *http.Client) (int, error) {
 
-	data := url.Values{}
-	for key, value := range body {
-		data.Set(key, value)
+	var data io.Reader
+
+	if body != nil {
+		info, err := json.Marshal(body)
+		if err != nil {
+			return 0, err
+		}
+		data = bytes.NewReader(info)
+	} else {
+		data = nil
 	}
 
-	request, err := http.NewRequest(method, resource, strings.NewReader(data.Encode()))
+	request, err := http.NewRequest(method, resource, data)
 
 	if err != nil || request == nil {
+		log.Fatal(request)
 		fmt.Println(err)
 		return 0, err
 	}
