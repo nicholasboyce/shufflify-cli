@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -124,8 +126,23 @@ func main() {
 
 		//if premium account, ask if they want to queue tracks. if yes, for each track in tracklist post to queue.
 		if profileInfo.Product == "premium" {
-			fmt.Println("Would you like to queue the tracks in your new playlist?")
-			fmt.Println("Implementation will be coming soon! For now, head on over to Spotify :)")
+			fmt.Println("Would you like to queue the tracks in your new playlist? Answer yes if so. ")
+			var shouldQueue string
+			if _, err := fmt.Scan(&shouldQueue); err != nil {
+				log.Fatal(err)
+			}
+			answer := strings.Trim(shouldQueue, " ")
+			answer = strings.ToLower(answer)
+			if answer == "yes" {
+				for _, track := range tracklist {
+					uri := url.Values{}
+					uri.Add("uri", track)
+					if status, err := FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/me/player/queue?%v", uri.Encode()), nil, nil, client); status != http.StatusNoContent {
+						fmt.Println(status)
+						log.Fatal(err)
+					}
+				}
+			}
 		}
 
 		//when done, print thank you message and say 'all done!'
