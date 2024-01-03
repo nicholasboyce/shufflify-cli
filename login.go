@@ -19,9 +19,11 @@ import (
 func LoginProcess(path string) *http.Client {
 	var clientID string
 
-	fmt.Print("Please input Client ID: ")
-	if _, err := fmt.Scan(&clientID); err != nil {
-		log.Fatal(err)
+	if clientID = os.Getenv("CLIENT_ID"); clientID == "" {
+		fmt.Print("Please input Client ID: ")
+		if _, err := fmt.Scan(&clientID); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	ctx := context.Background()
