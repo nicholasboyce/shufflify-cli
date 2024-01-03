@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -43,7 +44,7 @@ func main() {
 
 	os.Setenv("PATH_TO_CONFIG", path)
 
-	if !pathValid(path) { // simulates login state
+	if !pathValid(path) { // login state
 		client = LoginProcess(path)
 	} else {
 		client = createNewClient(path)
@@ -86,17 +87,15 @@ func main() {
 		//shuffle tracklist. then ask for title and description of playlist. post to user account.
 		Shuffle(tracklist)
 
+		scanner := bufio.NewScanner(os.Stdin)
+
 		fmt.Println("Name of new playlist: ")
-		var playlistTitle string
-		if _, err := fmt.Scan(&playlistTitle); err != nil {
-			log.Fatal(err)
-		}
+		scanner.Scan()
+		playlistTitle := scanner.Text()
 
 		fmt.Printf("%v's description: \n", playlistTitle)
-		var playlistDescription string
-		if _, err := fmt.Scan(&playlistDescription); err != nil {
-			log.Fatal(err)
-		}
+		scanner.Scan()
+		playlistDescription := scanner.Text()
 
 		playlistData := map[string]interface{}{
 			"name":        playlistTitle,
