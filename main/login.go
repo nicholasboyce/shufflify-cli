@@ -7,8 +7,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 
+	"github.com/pkg/browser"
 	"golang.org/x/oauth2"
 )
 
@@ -28,28 +30,42 @@ func LoginProcess(path string) *http.Client {
 			AuthURL:  "https://accounts.spotify.com/authorize",
 			TokenURL: "https://accounts.spotify.com/api/token",
 		},
-		RedirectURL: "http://localhost:5173",
+		RedirectURL: "http://localhost:5173/oauth/callback",
 	}
 
 	// use PKCE to protect against CSRF attacks
 	// https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-22.html#name-countermeasures-6
 	verifier := oauth2.GenerateVerifier()
 
+	//Create server which will collect the code for you
+	codeChan := make(chan string)
+
+	server := &http.Server{Addr: ":5173"}
+
+	http.HandleFunc("/oauth/callback", handleOauthCallback(ctx, conf, codeChan))
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server failed to start: %v", err)
+		}
+	}()
+
 	// Redirect user to consent page to ask for permission
 	// for the scopes specified above.
 	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline, oauth2.S256ChallengeOption(verifier))
-	fmt.Printf("Visit the URL for the auth dialog: %v\n", url)
+	fmt.Printf("Your browser has been opened to visit: %v\n", url)
+
+	if err := browser.OpenURL(url); err != nil {
+		panic(fmt.Errorf("failed to open browser for authentication %s", err.Error()))
+	}
 
 	// Use the authorization code that is pushed to the redirect
 	// URL. Exchange will do the handshake to retrieve the
 	// initial access token. The HTTP Client returned by
 	// conf.Client will refresh the token as necessary.
 
-	fmt.Println("Please input code parameter from redirect url: ")
-	var code string
-	if _, err := fmt.Scan(&code); err != nil {
-		log.Fatal(err)
-	}
+	code := <-codeChan
+
 	tok, err := conf.Exchange(ctx, code, oauth2.VerifierOption(verifier))
 	if err != nil {
 		log.Fatal(err)
@@ -60,6 +76,23 @@ func LoginProcess(path string) *http.Client {
 		log.Fatal(err)
 	}
 	return client
+}
+
+func handleOauthCallback(ctx context.Context, config *oauth2.Config, codeChan chan string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		queryParts, _ := url.ParseQuery(r.URL.RawQuery)
+
+		// Use the authorization code that is pushed to the redirect URL.
+		code := queryParts["code"][0]
+		log.Printf("code: %s\n", code)
+
+		// write the authorization code to the channel
+		codeChan <- code
+
+		msg := "<p><strong>Authentication successful</strong>. You may now close this tab.</p>"
+		// send a success message to the browser
+		fmt.Fprint(w, msg)
+	}
 }
 
 func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config, path string) error {
