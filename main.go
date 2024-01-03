@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -28,7 +29,9 @@ func main() {
 	}
 
 	if path == "" {
-		path = "shufflify/config.json"
+		execPath, _ := os.Executable()
+		parentFolder := filepath.Dir(execPath)
+		path = fmt.Sprint(parentFolder, "/shufflify/config.json")
 	}
 
 	if logout {

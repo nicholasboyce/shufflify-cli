@@ -97,6 +97,8 @@ shufflify-cli -h
 
 shufflify-cli creates a config file in order to help reduce the work it takes to login. It saves the information necessary to replicate the client, so all you need to do to log in is input your Client ID for the app and follow the instructions that appear in the terminal.
 
+When logged in shufflify-cli will by default save the JSON file it needs in a folder relative to its installation location. It really is the 'state' of the app (whether it's logged in or not). If that really upsets you, you have the freedom to change where this JSON file is saved. HOWEVER, The program may run in unintended ways if you aren't careful about where you save your files. Inputting your own path means relative paths will be relative to your current working directory. User beware!!!
+
 If you'd like to change the location where shufflify-cli looks for/saves the config file for ONE session, you can use the env variable PATH_TO_CONFIG:
 
 ```
