@@ -11,8 +11,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -25,16 +23,12 @@ func main() {
 	flag.BoolVar(&logout, "logout", false, "Logout command")
 	flag.Parse()
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	if path == "" {
 		path = os.Getenv("PATH_TO_CONFIG")
 	}
 
 	if path == "" {
-		path = "config.json"
+		path = "shufflify/config.json"
 	}
 
 	if logout {

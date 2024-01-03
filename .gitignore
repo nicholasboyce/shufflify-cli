@@ -1,2 +1,5 @@
 config.json
+shufflify_config.json
+shufflify/config.json
 shufflify-cli
+.env

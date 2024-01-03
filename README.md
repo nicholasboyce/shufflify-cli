@@ -65,7 +65,11 @@ shufflify-cli
 
 or by running it with arguments and/or flags as seen below.
 
-You can set your ClientID received from Spotify in the .env file so that you don't have to re-enter it every time you log in. 
+You can pass in your Client ID as an environment variable before running if you'd like:
+
+```
+CLIENT_ID=client_id_here shufflify-cli
+```
 
 #### Inputting playlist names
 
@@ -93,35 +97,40 @@ shufflify-cli -h
 
 shufflify-cli creates a config file in order to help reduce the work it takes to login. It saves the information necessary to replicate the client, so all you need to do to log in is input your Client ID for the app and follow the instructions that appear in the terminal.
 
+If you'd like to change the location where shufflify-cli looks for/saves the config file for ONE session, you can use the env variable PATH_TO_CONFIG:
+
+```
+PATH_TO_CONFIG=/path/to/config/here shufflify-cli
+```
+
+You can also use the -filepath flag as seen below instead of the env variable.
+
+```
+shufflify-cli -filepath=/path/to/config/here.json
+```
+
 To logout (delete the config file at the current specified location), you can either manually delete the config JSON file shufflify-cli will look for OR use the -logout flag. 
 
 ```
 shufflify-cli -logout
 ```
 
-NOTE: This deletes the config file at the path specified by the env variable PATH_TO_CONFIG, which you should set before running, either by editing the .env file (this persists) or on the command line (sets the path only for one session):
-
-```
-PATH_TO_CONFIG=/path/to/config/here shufflify-cli
-```
-
- If you do not set it before running, it defaults to ./config.json.
+If you do not specify a path before running, it defaults to ./shufflify/config.json.
 
 
-If you'd like to change the location where shufflify-cli looks for/saves the config file for ONE session, you can also use the -filepath flag as seen below. To persist this change, edit the .env directly.
+If you change the location of the config file, it's advisable to delete the current config file first, as it will not be deleted just by changing the config path - shufflify-cli will simply create a new file in the designated area. You can run -logout to delete the original config file before using -filepath.
 
-If you change the location of the config file using -filepath, it's advisable to delete the current config file first, as it will not be deleted just by changing the config path - shufflify-cli will create a new file in the designated area. You can run -logout to delete the original config file before using -filepath.
-
-```
-shufflify-cli -filepath=/path/to/config/here.json
-```
-
--logout and -filepath can be used in combination - logout will look for and delete the path specified in -filepath.
+-logout can be used in combination with -filepath or PATH_TO_CONFIG - logout will look for and delete the path specified.
 
 ```
 shufflify-cli -filepath=/path/to/config/here.json -logout
 ```
 
+OR 
+
+```
+PATH_TO_CONFIG=/path/to/config/here shufflify-cli -logout
+```
 
 ## Running the tests
 
