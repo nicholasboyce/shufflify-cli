@@ -39,7 +39,6 @@ func LoginProcess(path string) *http.Client {
 	// https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-22.html#name-countermeasures-6
 	verifier := oauth2.GenerateVerifier()
 
-	//Create server which will collect the code for you
 	codeChan := make(chan string)
 
 	server := &http.Server{Addr: ":5173"}
@@ -52,19 +51,12 @@ func LoginProcess(path string) *http.Client {
 		}
 	}()
 
-	// Redirect user to consent page to ask for permission
-	// for the scopes specified above.
 	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline, oauth2.S256ChallengeOption(verifier))
 	fmt.Printf("Your browser has been opened to visit: %v\n", url)
 
 	if err := browser.OpenURL(url); err != nil {
 		panic(fmt.Errorf("failed to open browser for authentication %s", err.Error()))
 	}
-
-	// Use the authorization code that is pushed to the redirect
-	// URL. Exchange will do the handshake to retrieve the
-	// initial access token. The HTTP Client returned by
-	// conf.Client will refresh the token as necessary.
 
 	code := <-codeChan
 
@@ -84,15 +76,12 @@ func handleOauthCallback(ctx context.Context, config *oauth2.Config, codeChan ch
 	return func(w http.ResponseWriter, r *http.Request) {
 		queryParts, _ := url.ParseQuery(r.URL.RawQuery)
 
-		// Use the authorization code that is pushed to the redirect URL.
 		code := queryParts["code"][0]
 		log.Printf("code: %s\n", code)
 
-		// write the authorization code to the channel
 		codeChan <- code
 
 		msg := "<p><strong>Authentication successful</strong>. You may now close this tab.</p>"
-		// send a success message to the browser
 		fmt.Fprint(w, msg)
 	}
 }
@@ -115,7 +104,7 @@ func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config, path string) e
 }
 
 func EncodeTokenAndConfig(file io.Writer, token interface{}, conf interface{}) error {
-	// encode token as JSON and write to file
+
 	encoder := json.NewEncoder(file)
 
 	if err := encoder.Encode(token); err != nil {
@@ -147,7 +136,7 @@ func fetchTokenAndConfig(path string) (*oauth2.Token, *oauth2.Config, error) {
 }
 
 func DecodeTokenAndConfig(file io.Reader, token interface{}, conf interface{}) error {
-	//decode from file and write to token and conf structs
+
 	decoder := json.NewDecoder(file)
 
 	if err := decoder.Decode(token); err != nil {

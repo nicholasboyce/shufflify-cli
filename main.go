@@ -52,7 +52,6 @@ func main() {
 
 	names := flag.Args()
 
-	//if flag.Args() >= 2, fetch user playlists. for every arg (playlist), if it's in user playlist set, add to tracklist.
 	if len(names) >= 2 {
 
 		userPlaylists := PlaylistItems{}
@@ -65,7 +64,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		//fetch user playlists
 		if _, err := FetchWebAPI("GET", "https://api.spotify.com/v1/me/playlists", nil, &userPlaylists, client); err != nil {
 			log.Fatal(err)
 		}
@@ -84,7 +82,6 @@ func main() {
 			}
 		}
 
-		//shuffle tracklist. then ask for title and description of playlist. post to user account.
 		Shuffle(tracklist)
 
 		scanner := bufio.NewScanner(os.Stdin)
@@ -102,7 +99,6 @@ func main() {
 			"description": playlistDescription,
 		}
 
-		//create user playlist
 		playlistPostResponse := Response{}
 
 		if status, err := FetchWebAPI("POST", fmt.Sprintf("https://api.spotify.com/v1/users/%v/playlists", profileInfo.ID), playlistData, &playlistPostResponse, client); status != http.StatusCreated {
@@ -110,7 +106,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		//add tracks to user playlist
 		playlistTrackBodyData := map[string]interface{}{
 			"uris": tracklist,
 		}
@@ -120,10 +115,8 @@ func main() {
 			log.Fatal(err)
 		}
 
-		//post url to playlist for user to click on/copy.
 		fmt.Printf("Check out your new playlist at %v\n", playlistPostResponse.External_urls.Spotify)
 
-		//if premium account, ask if they want to queue tracks. if yes, for each track in tracklist post to queue.
 		if profileInfo.Product == "premium" {
 			fmt.Println("Would you like to queue the tracks in your new playlist? Answer yes if so. ")
 			var shouldQueue string
@@ -144,7 +137,6 @@ func main() {
 			}
 		}
 
-		//when done, print thank you message and say 'all done!'
 		fmt.Println("Thank you for using Shufflify!")
 	}
 
