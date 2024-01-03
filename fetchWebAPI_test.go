@@ -1,12 +1,10 @@
-package main_test
+package main
 
 import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/nicholasboyce/shufflify-cli/main"
 )
 
 func TestFetchWebAPI(t *testing.T) {
@@ -99,7 +97,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		profileInfo := ProfileInfo{}
 
-		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me", server.URL), nil, &profileInfo, client)
+		_, err := FetchWebAPI("GET", fmt.Sprintf("%s/v1/me", server.URL), nil, &profileInfo, client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -142,7 +140,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		playlistItems := PlaylistItems{}
 
-		_, err := main.FetchWebAPI("GET", fmt.Sprintf("%s/v1/me/playlists", server.URL), nil, &playlistItems, client)
+		_, err := FetchWebAPI("GET", fmt.Sprintf("%s/v1/me/playlists", server.URL), nil, &playlistItems, client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -182,7 +180,7 @@ func TestFetchWebAPI(t *testing.T) {
 
 		response := TrackItems{}
 
-		status, err := main.FetchWebAPI(http.MethodGet, fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
+		status, err := FetchWebAPI(http.MethodGet, fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
 		if err != nil {
 			t.Error(err)
 		}
@@ -205,7 +203,7 @@ func TestFetchWebAPI(t *testing.T) {
 			Snapshot_id string `json:"snapshot_id"`
 		}
 
-		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
+		FetchWebAPI("POST", fmt.Sprintf("%s/v1/playlists/playlist_id/tracks", server.URL), nil, &response, client)
 
 		fmt.Println(response)
 		fmt.Println("")
@@ -228,7 +226,7 @@ func TestFetchWebAPI(t *testing.T) {
 		{
 		}
 
-		main.FetchWebAPI("POST", fmt.Sprintf("%s/v1/users/user_id/playlists", server.URL), nil, &response, client)
+		FetchWebAPI("POST", fmt.Sprintf("%s/v1/users/user_id/playlists", server.URL), nil, &response, client)
 
 		fmt.Println(response)
 		fmt.Println("")

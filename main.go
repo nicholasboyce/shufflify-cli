@@ -29,7 +29,7 @@ func main() {
 	}
 
 	if path == "" {
-		path = os.Getenv("PATH_TO_AUTH_DETAILS")
+		path = os.Getenv("PATH_TO_CONFIG")
 	}
 
 	if path == "" {
@@ -41,7 +41,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	os.Setenv("PATH_TO_AUTH_DETAILS", path)
+	os.Setenv("PATH_TO_CONFIG", path)
 
 	if !pathValid(path) { // simulates login state
 		client = LoginProcess(path)
@@ -51,12 +51,12 @@ func main() {
 
 	names := flag.Args()
 
-	userPlaylists := PlaylistItems{}
-	userPlaylistNames := make(map[string]string)
-	tracklist := []string{}
-
 	//if flag.Args() >= 2, fetch user playlists. for every arg (playlist), if it's in user playlist set, add to tracklist.
 	if len(names) >= 2 {
+
+		userPlaylists := PlaylistItems{}
+		userPlaylistNames := make(map[string]string)
+		tracklist := []string{}
 
 		profileInfo := ProfileInfo{}
 
