@@ -24,11 +24,6 @@ func main() {
 	flag.BoolVar(&logout, "logout", false, "Logout command")
 	flag.Parse()
 
-	if logout {
-		os.RemoveAll(os.Getenv("PATH_TO_AUTH_DETAILS"))
-		os.Exit(0)
-	}
-
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -39,6 +34,11 @@ func main() {
 
 	if path == "" {
 		path = "config.json"
+	}
+
+	if logout {
+		os.RemoveAll(path)
+		os.Exit(0)
 	}
 
 	os.Setenv("PATH_TO_AUTH_DETAILS", path)
