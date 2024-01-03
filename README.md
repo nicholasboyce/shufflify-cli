@@ -1,7 +1,7 @@
 # Shufflify CLI
 
 A command line usable version of https://www.shufflify.app written in Go.
-shufflify-cli uses OAuth PKCE to consume the Spotify API. It accepts as arguments the titles of the Spotify playlists you wish to shuffle together into one big playlist. It allows you to title the new shuffled mega-playlist and posts it to your Spotify account. The playlists are private by default. When inputting the title of the playlist, surround multi word titles with quotes, e.g. "My example playlist", and be mindful of escaping characters, e.g. "Playlist\!" instead of "Playlist!"
+shufflify-cli uses OAuth PKCE to consume the Spotify API. It accepts as arguments the titles of the Spotify playlists you wish to shuffle together into one big playlist. It allows you to title the new shuffled mega-playlist and posts it to your Spotify account. The playlists are private by default. When inputting the title of the playlist, surround multi word titles with quotes, e.g. "My example playlist", and be mindful of escaping characters, e.g. "Playlist\\!" instead of "Playlist!"
 
 ## Getting Started
 
