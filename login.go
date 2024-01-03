@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/pkg/browser"
 	"golang.org/x/oauth2"
@@ -96,6 +98,13 @@ func handleOauthCallback(ctx context.Context, config *oauth2.Config, codeChan ch
 }
 
 func saveTokenAndConfig(token *oauth2.Token, conf *oauth2.Config, path string) error {
+	if dir := filepath.Dir(path); dir != "." {
+		os.MkdirAll(dir, 0755)
+	}
+	if ext := filepath.Ext(path); ext != ".json" {
+		path = strings.TrimSuffix(path, ext)
+		path = fmt.Sprint(path, ".json")
+	}
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("unable to create token file: %v", err)
